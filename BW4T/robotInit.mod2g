@@ -14,5 +14,7 @@ module robotInit {
 	% Exercise 2.1a: insert rules for processing percepts that are sent only at the beginning of a session, 
 	%  and/or need to be initialized.	
 	forall percept(place(Place)) do insert(place(Place)).
-	forall percept(sequence(Sequence)) do insert(sequence(Sequence)).
+	forall percept(sequence(Color)) do insert(sequence(Color)).
+	forall percept(sequenceIndex(Index)) do insert(sequenceIndex(Index)).
+	
 }

@@ -7,34 +7,37 @@ module robotEvents {
 	
 	% Record when we are entering or leaving a room.
 	forall percept(in(Place)) do insert( in(Place) ).
-	forall percept(not(in(Place))) do delete( in(Place) ).
+	forall percept(not(in(Place))) do delete( in(Place) ) + insert(visited(Place)).
 
 	% Exercise 2.1b: insert rules for handling percepts other than "sendonce" percepts.
 	%on change
 	forall bel(at(Place)), percept(at(NewPlace)) do delete(at(Place)) + insert(at(NewPlace)).
 	forall bel(sequenceIndex(Index)), percept(sequenceIndex(NewIndex)) do delete(sequenceIndex(Index)) + insert(sequenceIndex(NewIndex)).
-	
+		
 	%on change with negation
 	forall percept(atBlock(Block)) do insert(atBlock(Block)).
 	forall percept(not(atBlock(Block))) do delete(atBlock(Block)).
-	
-	forall percept(occupied(Room)) do insert(occupied(Room)).
-	forall percept(not(occupied(Room))) do delete(occupied(Room)).
 	
 	forall percept(holding(Block)) do insert(holding(Block)).
 	forall percept(not(holding(Block))) do delete(holding(Block)).
 	
 	%always
 	forall percept(color(Block, Color)), not(bel(color(Block,Color))) do insert(color(Block, Color)).
-	forall bel(color(Block, Color)), not(percept(color(Block, color))) do delete(color(Block, Color)).
+	forall bel(color(Block, Color)), not(percept(color(Block, Color))) do delete(color(Block, Color)).
+	
+	forall bel(color(Block, Color)), bel(in(Room)) do insert(block(Block, Color, Room)).
+	
+	
 	
 	% Exercise 2.5b: insert code for goal management that allows an agent to systematically search for blocks. (if needed)
-	forall percept(block(Block, Color, Room)) do adopt(in(Room)).
-	forall percept(position(Block,X,Y)) do adopt(atBlock(Block)).
-	forall percept(atBlock(Block)) do adopt(holding(Block)).
-	%forall percept(holding(Block)) 
+	forall bel(atBlock(Block)), bel(color(Block, Color)), bel(nextColorInSeq(Color)) do adopt(holding(Block)).
+	forall bel(nextColorInSeq(Color)) , bel(block(Block, Color, Room)), bel(not(in(Room))) do adopt(in(Room)).
+	forall bel(nextColorInSeq(Color)) , bel(not(holding(_))), bel(block(Block, Color, Room)) do adopt(atBlock(Block)).
+	forall bel(holding(Block)) do adopt(in('DropZone')).
+	if bel(nextColorInSeq(Color)) then adopt(nextColorInSeq(Color)).
+	if not(bel(nextColorInSeq(Color))) then drop(true).
 	
-		
+	
 	% Exercise 2.6b: insert code for goal management that makes the agent deliver a block when it 
 	%   knows about a block that can be delivered. (if needed)
 }
